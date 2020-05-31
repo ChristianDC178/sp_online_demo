@@ -43,7 +43,7 @@ namespace SP.Online.Demo
                         AuthToken = JsonConvert.DeserializeObject<SPAuthResponse>(response.Content.ReadAsStringAsync().Result).access_token;
                     }
 
-                    return false;
+                    return true;
 
                 }
             }
@@ -61,9 +61,7 @@ namespace SP.Online.Demo
                 using (_client = new HttpClient())
                 {
 
-                    string oDataUrl =
-                        $"https://{_spConfig.SPUrl}/_api/web/GetFolderByServerRelativeUrl('{_spConfig.LibraryURL}/{folderName}')/Files?$select=Name";
-
+                    string oDataUrl = $"https://{_spConfig.SPUrl}/_api/web/GetFolderByServerRelativeUrl('{_spConfig.LibraryURL}/{folderName}')/Files?$select=Name";
 
                     HttpRequestMessage httpReqMsg = new HttpRequestMessage(HttpMethod.Get, oDataUrl);
 
@@ -149,7 +147,7 @@ namespace SP.Online.Demo
                 using (_client = new HttpClient())
                 {
 
-                    string oDataUrl =$"https://{_spConfig.SPUrl}/_api/web/GetFileByServerRelativeUrl('{_spConfig.LibraryURL}/{folderName}/{fileName}')/?$value";
+                    string oDataUrl = $"https://{_spConfig.SPUrl}/_api/web/GetFileByServerRelativeUrl('{_spConfig.LibraryURL}/{folderName}/{fileName}')/?$value";
 
 
                     HttpRequestMessage httpRequestMessage = new HttpRequestMessage(HttpMethod.Get, oDataUrl);
@@ -157,6 +155,8 @@ namespace SP.Online.Demo
                     httpRequestMessage.Headers.Add("authorization", $"Bearer {AuthToken}");
 
                     _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", AuthToken);
+
+                      var c =  _client.GetAsync(oDataUrl).Result;
 
                     MemoryStream response = (MemoryStream)_client.GetAsync(oDataUrl).Result.Content.ReadAsStreamAsync().Result;
 

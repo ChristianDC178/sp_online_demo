@@ -9,32 +9,68 @@ namespace SP.Online.Demo
         public static void Main(string[] args)
         {
 
-            SPConfiguration sPConfiguration = new SPConfiguration()
+            try
             {
-                ClientSecret = "PmLL9XltXlFLaltyxK0zyNdtmeAMYBkdDZcRQ63pjcc=",
-                ClientId = "75105401-4903-4852-bd8c-1737ba72fd2e",
-                TenantId = "be803806-c5e6-4fe6-9f88-29e2a5b37146",
-                SPUrl = "cdcsharepoint178.sharepoint.com",
-                LibraryURL = "ChristianDC"
-            };
+                SPConfiguration sPConfiguration = new SPConfiguration()
+                {
+                    ClientSecret = "YsshbJsH1UPgeRd07UVKN8xNH3o5Sc6dlrnxhsNmc0k=",
+                    ClientId = "3b9e6c50-065e-45e6-9cc1-05dd9ef1657d",
+                    TenantId = "90295537-9508-4e55-bcc6-eb7d75692b82",
+                    SPUrl = "cdc178202005.sharepoint.com",
+                    LibraryURL = "ChristianDC"
+                };
 
-            SPClient sPClient = new SPClient(sPConfiguration);
+                SPClient sPClient = new SPClient(sPConfiguration);
 
-            sPClient.BeginSesion();
+                if (sPClient.BeginSesion())
+                {
 
-            List<SPFile> files = new List<SPFile>();
+                    Console.WriteLine("Signin succesful !");
+                    Console.WriteLine($"The access token: {sPClient.AuthToken}");
 
-            foreach (var item in new string[] { "Folder_one", "Folder_two" }) //new string[] { "Folder_one", "Folder_two" })
+                    Console.WriteLine("Listing files from the folders");
+                    List<SPFile> files = new List<SPFile>();
+
+
+                    foreach (var item in new string[] { "Folder_one", "Folder_two" }) //new string[] { "Folder_one", "Folder_two" })
+                    {
+                        files.AddRange(sPClient.GetFilesFromFolder(item));
+                    }
+
+                    files.ForEach((f) => { Console.WriteLine($"File: {f.Folder}/{f.Name}"); });
+
+                    Console.WriteLine("Downloading the files to a local folder");
+
+
+
+                    //DownloadAll
+                    foreach (var item in files)
+                    {
+                        var str = sPClient.DownloadFile(item.Folder, item.Name);
+                    }
+
+
+                    Console.WriteLine("Done !");
+                }
+                else
+                {
+                    Console.WriteLine("Signin failed !!");
+                }
+
+            }
+            catch (Exception ex)
             {
-                files.AddRange(sPClient.GetFilesFromFolder(item));
+                Console.WriteLine($"Ups , there is an error: {ex.Message}");
             }
 
-            //DownloadAll
-            foreach (var item in files)
+            finally
             {
-                var str = sPClient.DownloadFile(item.Folder, item.Name);
+                Console.ReadKey();
             }
 
         }
+
     }
+
+
 }
